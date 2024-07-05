@@ -31,7 +31,7 @@ class SpeechService:
 
     def synthesize_ssml(self, ssml, file_output):
         languages = {
-            "pt-BR":{"language_code":"pt-BR", "name":"pt-BR-Standard-B", "ssml_gender":texttospeech.SsmlVoiceGender.MALE},
+            "pt-BR":{"language_code":"pt-BR", "name":"pt-BR-Wavenet-B", "ssml_gender":texttospeech.SsmlVoiceGender.MALE},
             "en-US":{"language_code":"en-US", "name":"en-US-Studio-Q", "ssml_gender":texttospeech.SsmlVoiceGender.MALE},
         }
 
