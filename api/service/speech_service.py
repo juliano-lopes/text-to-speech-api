@@ -29,10 +29,10 @@ class SpeechService:
         blob = self.auth.get_bucket().blob(nome_blob)
         blob.delete()
 
-    def synthesize_ssml(self, ssml, file_output):
+    def synthesize_ssml(self, ssml, file_output, voice_timbre):
         languages = {
-            "pt-BR":{"language_code":"pt-BR", "name":"pt-BR-Wavenet-B", "ssml_gender":texttospeech.SsmlVoiceGender.MALE},
-            "en-US":{"language_code":"en-US", "name":"en-US-Studio-Q", "ssml_gender":texttospeech.SsmlVoiceGender.MALE},
+            "pt-BR":{"language_code":"pt-BR", "name":{"m":"pt-BR-Wavenet-B", "f":"pt-BR-Wavenet-C"}, "ssml_gender":{"m":texttospeech.SsmlVoiceGender.MALE, "f":texttospeech.SsmlVoiceGender.FEMALE}},
+            "en-US":{"language_code":"en-US", "name":{"m":"en-US-Studio-Q", "f":"en-US-Wavenet-H"}, "ssml_gender":{"m":texttospeech.SsmlVoiceGender.MALE, "f":texttospeech.SsmlVoiceGender.MALE}},
         }
 
         """Synthesizes speech from the input string of ssml.
@@ -50,8 +50,8 @@ class SpeechService:
         language = languages[self.translate_language]
         voice = texttospeech.VoiceSelectionParams(
             language_code=language["language_code"],
-            name=language["name"],
-            ssml_gender=language["ssml_gender"],
+            name=language["name"][voice_timbre],
+            ssml_gender=language["ssml_gender"][voice_timbre],
         )
 
         audio_config = texttospeech.AudioConfig(
@@ -81,8 +81,8 @@ class SpeechService:
 
         total_time = 0
         final_audio = None
-        default_speed = 120
-        max_speed = 140
+        default_speed = 126
+        max_speed = 136
         speed = default_speed
 
         for line in translation:
@@ -91,20 +91,25 @@ class SpeechService:
                 continue
             else:
                 frase = line["translated_phrase"]
+                voice_timbre = line["voice_timbre"]
+                if voice_timbre == "i": # i is iqual undefined
+                    voice_timbre = "m" # it is set to male timbre
+                print("voice_timbre foi ", voice_timbre)
                 time = int(Util.timestamp_to_seconds(line["time"]))
 
             if total_time == 0:
                 # início
                 if time > 0:
                     # criar silencio inicial:
-                    silence = f"<break time='{time + 1}s'/>"
+                    #silence = f"<break time='{time + 1}s'/>"
+                    silence = f"<break time='{time}s'/>"
 
-                    audio = self.synthesize_ssml(f"<speak>{silence}<prosody rate='{speed}%'>{frase}</prosody></speak>",f"{destination}/{time}-audio_speed_{speed}.wav")
+                    audio = self.synthesize_ssml(f"<speak>{silence}<prosody rate='{speed}%'>{frase}</prosody></speak>",f"{destination}/{time}-audio_speed_{speed}.wav", voice_timbre)
                     audio = AudioConverter(audio,f"{destination}/{time}-audio_mono", "wav")
                     audio = audio.convert()
                     final_audio = audio
                 else:
-                    audio = self.synthesize_ssml(f"<speak><prosody rate='{speed}%'>{frase}</prosody></speak>",f"{destination}/{time}-audio_speed_{speed}.wav")
+                    audio = self.synthesize_ssml(f"<speak><prosody rate='{speed}%'>{frase}</prosody></speak>",f"{destination}/{time}-audio_speed_{speed}.wav", voice_timbre)
                     audio = AudioConverter(audio,f"{destination}/{time}-audio_mono", "wav")
                     audio = audio.convert()
                     final_audio = audio
@@ -113,8 +118,9 @@ class SpeechService:
                 #da segunda vez para frente:
                 if (time - total_time) > 0:
                     speed = default_speed
-                    silence = f"<break time='{(time - total_time) + 1}s'/>"
-                    audio = self.synthesize_ssml(f"<speak>{silence}<prosody rate='{speed}%'>{frase}</prosody></speak>",f"{destination}/{time}-audio_speed_{speed}.wav")
+                    #silence = f"<break time='{(time - total_time) + 1}s'/>"
+                    silence = f"<break time='{(time - total_time)}s'/>"
+                    audio = self.synthesize_ssml(f"<speak>{silence}<prosody rate='{speed}%'>{frase}</prosody></speak>",f"{destination}/{time}-audio_speed_{speed}.wav", voice_timbre)
                     audio = AudioConverter(audio, f"{destination}/{time}-audio_mono", "wav")
                     audio = audio.convert()
                     final_audio = AudioConverter.join_audios(final_audio, audio, f"{destination}/joined-final-{time}.wav")
@@ -126,13 +132,13 @@ class SpeechService:
                         speed = new_speed
                     else:
                         speed = max_speed
-                    audio = self.synthesize_ssml(f"<speak><prosody rate='{speed}%'>{frase}</prosody></speak>",f"{destination}/{time}-audio_speed_{new_speed}.wav")
+                    audio = self.synthesize_ssml(f"<speak><prosody rate='{speed}%'>{frase}</prosody></speak>",f"{destination}/{time}-audio_speed_{new_speed}.wav", voice_timbre)
                     audio = AudioConverter(audio, f"{destination}/{time}-audio_mono", "wav")
                     audio = audio.convert()
                     final_audio = AudioConverter.join_audios(final_audio, audio, f"{destination}/joined-final-{time}.wav")
 
                 else:
-                    audio = self.synthesize_ssml(f"<speak><prosody rate='{speed}%'>{frase}</prosody></speak>",f"{destination}/{time}-audio_speed_{speed}.wav")
+                    audio = self.synthesize_ssml(f"<speak><prosody rate='{speed}%'>{frase}</prosody></speak>",f"{destination}/{time}-audio_speed_{speed}.wav", voice_timbre)
                     audio = AudioConverter(audio, f"{destination}/{time}-audio_mono", "wav")
                     audio = audio.convert()
                     final_audio = AudioConverter.join_audios(final_audio, audio, f"{destination}/joined-final-{time}.wav")
