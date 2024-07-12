@@ -15,8 +15,11 @@ Essa API tem como objetivo converter um texto em áudio. Para isso são utilizad
 * Será necessário instalar o docker para executar a aplicação em um container.
 * Na raiz do projeto, Crie a imagem por meio do Dockerfile:  
 **docker build -t dub_videos_speech .**  
-* Após criar a imagem, execute o comando:  
-**docker run -it -p 5002:5002 dub_videos_speech**  
+* Após criar a imagem, certifique-se que uma rede foi criada para que este container e os containers das outras APIs possam se comunicar:
+**docker network create dub_videos_network**
+* Após criar a rede, execute o comando:  
+**docker run -it --network=dub_videos_network --hostname=dub_videos_speech -p 5002:5002 dub_videos_speech**  
+* Observe que a rede dub_videos_network deve existir para que os containers possam se comunicar. Verifique sua criação na API principal.
 * A aplicação estará disponível pela porta local 5002
 * Abra o endereço:  
 http://localhost:5002   
