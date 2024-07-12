@@ -1,4 +1,4 @@
-# API para aplicação DubVideos
+# Componente 2 - API para aplicação DubVideos
 * [Front-end Dub Videos](https://github.com/juliano-lopes/dub-videos-front-end)
 ## Como utilizar
 Essa API tem como objetivo converter um texto em áudio. Para isso são utilizadas algumas API da Google:
