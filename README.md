@@ -29,4 +29,4 @@ no navegador.
 * Acesse a URL http://localhost:5002 e escolha a documentação (Swagger). Após isso execute as rotas com os valores padrão de exemplo.
 
 ## Apresentação da Aplicação
-* [Assista a o vídeo de aprensentação da aplicação Dub Videos](https://youtu.be/tfAVGTcRtCA)
+* [Assista a o vídeo de aprensentação da aplicação Dub Videos](https://youtu.be/ISk4ukqWnfg)
