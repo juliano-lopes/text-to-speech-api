@@ -1,4 +1,6 @@
 # Componente 2 - API para aplicação DubVideos
+**Para executar o projeto com mais facilidade, você pode também seguir as instruções contidas no repositório do [Projeto Dub Videos](https://github.com/juliano-lopes/dub-videos-project) para poder subir todos os componentes utilizando docker-compose**.  
+
 * [Front-end Dub Videos](https://github.com/juliano-lopes/dub-videos-front-end)
 ## Como utilizar
 Essa API tem como objetivo converter um texto em áudio. Para isso são utilizadas algumas API da Google:
